@@ -6,26 +6,38 @@ const elastic = require('elasticsearch');
 
 const bodyParser = require('body-parser').json();
 
+const cors = require('cors');
+
 const elasticClient = elastic.Client({
-    host: 'localhost:9200'
+    host: 'localhost:9200',
+    apiVersion: '7.2'
 });
 
-router.use((req, res, next) => {
-    elasticClient.index({
-        index: 'logs',
-        body: {
-            url: req.url,
-            method: req.method
-        }
-    })
-    .then(res => {
-        console.log('Logs indexed');
-    })
-    .catch(err => {
-        console.log(err+" err");
-    })
-    next();
-});
+router.use(cors());
+
+// router.use((req, res, next) => {
+//     elasticClient.index({
+//         index: 'logs',
+//         body: {
+//             url: req.url,
+//             method: req.method
+//         }
+//     })
+//     .then(res => {
+//         console.log('Logs indexed');
+//     })
+//     .catch(err => {
+//         console.log(err+" err");
+//     })
+//     next();
+// });
+
+router.get('/data', (req, res) => {
+    const data = req.body;
+    console.log(req);
+    res.send(`Received ${data}`);
+})
+
 
 router.post('/shows', bodyParser, (req, res) => {
     elasticClient.index({
