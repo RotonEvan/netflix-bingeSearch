@@ -3,7 +3,7 @@ const app = express();
 
 const routes = require('./routes');
 
-const indexer = require('./indexer');
+// const indexer = require('./indexer');
 
 let port = process.env.PORT || 3000;
 
