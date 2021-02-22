@@ -44,6 +44,7 @@ router.get('/top', (req, res) => {
     elasticClient.search({
         index: 'netflix',
         body: {
+            "size": 5,
             "query": {
                 "multi_match": {
                     "query": q
@@ -59,26 +60,25 @@ router.get('/top', (req, res) => {
     });
 });
 
-// http://localhost:3000/top-rated?q=to
+// http://localhost:3000/toprated?q=to
 
-router.get('/top-rated', (req, res) => {
-    let q = req.query.q;
+router.get('/toprated', (req, res) => {
     elasticClient.search({
         index: 'netflix',
         body: {
-            "query": {
-                "multi_match": {
-                    "query": q
-                }
-            },
-            "filter" :{
-                "bool": {
-                    "must_not": {
-                        "terms": {
-                            "rating": ['R', 'NC', 'PG']
-                        }
-                    }
-                }
+            "size": 5,
+            "query": {  
+                "bool" : {
+                    "must" : {
+                        "match_phrase" : { "title" : { query: req.query.q} }
+                    },
+                    "must_not" : {
+                        "match_phrase" : { "rating" : "R" },
+                        "match_phrase" : { "rating" : "NC" },
+                        "match_phrase" : { "rating" : "PG" }
+                    },
+                    
+                  }
             }
         }
     }).then(function(resp) {
@@ -120,7 +120,7 @@ router.get('/paginate', function (req, res) {
 router.get('/exact', function (req, res) {
     var key={}
     key[req.query.field]={query : req.query.q}
-    client.search({
+    elasticClient.search({
     index: 'netflix',
     body: {
         "query": {
@@ -162,7 +162,7 @@ router.get('/prefix', function (req, res) {
     });
 });
 
-// http://localhost:3000/custom/prefix?q=Drama
+// http://localhost:3000/genre?q=Drama%20and%20Horror
 
 router.get('/genre', function (req, res) {
     elasticClient.search({
@@ -172,6 +172,42 @@ router.get('/genre', function (req, res) {
                     "query_string" : {
                         "default_field" : "listed_in",
                         "query" : req.query.q
+                    }
+            }
+        }
+    }).then(function(resp) {
+        console.log("Response: ", resp);
+        res.send(resp);
+    }, function(err) {
+        console.trace(err.message);
+        res.send(err.message);
+    });
+});
+
+router.get('/exact2', function (req, res) {
+    elasticClient.search({
+        index: 'netflix',
+        body: {
+            "query": {
+                    "query_string" : {
+                        "default_field" : "listed_in",
+                        "query" : req.query.q,
+                        "analyzer": {
+                            "my_analyzer": {
+                                "tokenizer": "my_tokenizer"
+                            }
+                        },
+                        "tokenizer": {
+                            "my_tokenizer": {
+                                "type": "ngram",
+                                "min_gram": 3,
+                                "max_gram": 4,
+                                "token_chars": [
+                                    "letter",
+                                    "digit"
+                                ]
+                            }
+                        }
                     }
             }
         }
