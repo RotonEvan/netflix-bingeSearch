@@ -9,7 +9,7 @@ const bodyParser = require('body-parser').json();
 const cors = require('cors');
 
 const elasticClient = elastic.Client({
-    host: 'localhost:9200',
+    host: '52.66.252.139:9200',
     apiVersion: '7.2'
 });
 
