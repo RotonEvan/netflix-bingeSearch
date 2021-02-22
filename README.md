@@ -25,3 +25,5 @@ http://localhost:3000/prefix?value=After
 /genre - for documents with matching genres
 
 http://localhost:3000/genre?q=Drama%20and%20Horror
+
+### ElasticSearch Server taken from Group 3
