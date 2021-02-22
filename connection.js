@@ -1,7 +1,7 @@
 const elastic = require('elasticsearch');
 
 const elasticClient = elastic.Client({
-    host: 'localhost:9200',
+    host: '52.66.252.139:9200',
     // log: 'trace',
     sniffOnStart: true
 
